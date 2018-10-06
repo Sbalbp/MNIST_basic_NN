@@ -24,44 +24,44 @@ class SimpleNN(object):
     def __init_layers(self, layers, weight_factor = 1):
         self.weights = []
         self.biases = []
-        
+
         for i in range( len(layers)-1 ):
             self.weights.append(weight_factor * np.random.normal( 0, 1, (layers[i], layers[i+1] )))
             self.biases.append(weight_factor * np.random.normal( 0, 1, (1, layers[i+1] )))
-        
+
     def __init__(self, input_size, output_size, mid_layers = [300], weight_factor = 1):
         self.__init_layers([input_size] + mid_layers + [output_size], weight_factor)
-        
+
     # Forward computation
     def forward(self, ipt):
         x = ipt
         self.inputs = []
-        
+
         for weight, bias in zip(self.weights, self.biases):
             self.inputs.append(x)
-            
+
             # Multiply by weights and add bias
             wb = np.matmul(x, weight) + bias
             # Logistic activation
             x = 1 / (1 + np.exp(-wb))
-            
+
         return x
-        
+
     # Backpropagation of error
     def backward(self, output, expected):
         self.gradients = []
-        
+
         # Error gradient on the output layer
         grad = output * (1 - output) * (output - expected)
         # Store the gradients
         self.gradients.insert(0, grad)
-        
+
         for i in range(len(self.weights)-1, 0, -1):
             # Propagate the error
             grad = self.inputs[i] * (1 - self.inputs[i]) * np.reshape( np.sum(grad * self.weights[i], 1), (1, self.weights[i].shape[0]) )
             # Store the gradients
             self.gradients.insert(0, grad)
-        
+
     # Update weights and biases
     def update(self, lr = 0.5):
         for weight, bias, grad, inpt in zip(self.weights, self.biases, self.gradients, self.inputs):
@@ -160,13 +160,13 @@ if( use_nn ):
 	    tr_error = 0
 	    for j in range(train_data.shape[0]):
 	        ipt_data = train_data[j:j+1]
-	        
+
 	        fwd = nn.forward(ipt_data)
 	        tr_error += np.sum( ( train_one_hot[j:j+1] - fwd )**2 ) / 10
 	        nn.backward(fwd, train_one_hot[j:j+1])
 	        nn.update( learning_rate )
-	    
-	    # Pass through the validation set (only forward pass)    
+
+	    # Pass through the validation set (only forward pass)
 	    val_error = 0
 	    for j in range(val_data.shape[0]):
 	        fwd = nn.forward(val_data[j:j+1])
@@ -210,7 +210,7 @@ if( use_bagging ):
 
 	    # Train each network over 60% of the training instances (weak classifier - reduces correlation between models)
 	    instance_perm = np.random.permutation( train_data.shape[0] )[ 0:int( train_data.shape[0] * 0.6 ) ]
-	    
+
 	    # In each epoch...
 	    for i in range( epochs_bagging ):
 	    	# ...pass through the training set
@@ -221,7 +221,7 @@ if( use_bagging ):
 	            net.backward(fwd, train_one_hot[j:j+1])
 	            net.update( learning_rate )
 	        print('Classifier %d, Epoch %d' % (n_classifier, i))
-	    
+
 	    nets.append(net)
 
 	# Training
@@ -233,3 +233,4 @@ if( use_bagging ):
 	    result_sum += nets[n_classifier].forward(test_data)
 	# Accuracy
 	print( 'Bagging - Accuracy on test data: %f' % (np.sum( np.argmax(result_sum, 1) == test_labels ) / float(test_data.shape[0]) ) )
+
