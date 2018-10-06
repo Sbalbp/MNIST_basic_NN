@@ -1,0 +1,16 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.1
+
+    working_directory: ~/MNIST_basic_NN
+
+    steps:
+      - checkout
+      - run:
+        command: |
+          . venv/bin/activate
+          pytest .
+
