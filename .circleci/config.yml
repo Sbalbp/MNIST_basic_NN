@@ -1,38 +1,32 @@
 version: 2
 jobs:
-  build:
+  py2-build:
     docker:
-      - image: circleci/python:3.6.1
+      - image: circleci/python:2.7
 
     working_directory: ~/repo
 
     steps:
       - checkout
 
-      # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - v1-py2-dependencies-{{ checksum "requirements.txt" }}
+          - v1-py2-dependencies-
 
       - run:
           name: install dependencies
           command: |
-            python2 -m virtualenv venv2
+            pip install --user virtualenv
+            python -m virtualenv venv2
             . venv2/bin/activate
             pip install -r requirements.txt
 
       - save_cache:
           paths:
             - ./venv2
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          key: v1-py2-dependencies-{{ checksum "requirements.txt" }}
 
-      # run tests!
-      # this example uses Django's built-in test-runner
-      # other common Python testing frameworks include pytest and nose
-      # https://pytest.org
-      # https://nose.readthedocs.io
       - run:
           name: run tests
           command: |
@@ -42,3 +36,47 @@ jobs:
       - store_artifacts:
           path: test-reports
           destination: test-reports
+
+  py3-build:
+    docker:
+      - image: circleci/python:3.6.1
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-py3-dependencies-{{ checksum "requirements.txt" }}
+          - v1-py3-dependencies-
+
+      - run:
+          name: install dependencies
+          command: |
+            python3 -m venv venv3
+            . venv3/bin/activate
+            pip install -r requirements.txt
+
+      - save_cache:
+          paths:
+            - ./venv3
+          key: v1-py3-dependencies-{{ checksum "requirements.txt" }}
+
+      - run:
+          name: run tests
+          command: |
+            . venv3/bin/activate
+            pytest .
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
+
+workflows:
+  version: 2
+  python2&3:
+    jobs:
+      - py2-build
+      - py3-build
+
