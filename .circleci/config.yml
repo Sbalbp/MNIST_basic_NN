@@ -1,19 +1,8 @@
-# Python CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-python/ for more details
-#
 version: 2
 jobs:
   build:
     docker:
-      # specify the version you desire here
-      # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
       - image: circleci/python:3.6.1
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
 
     working_directory: ~/repo
 
@@ -30,13 +19,13 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            python3 -m venv venv
-            . venv/bin/activate
+            python2 -m virtualenv venv2
+            . venv2/bin/activate
             pip install -r requirements.txt
 
       - save_cache:
           paths:
-            - ./venv
+            - ./venv2
           key: v1-dependencies-{{ checksum "requirements.txt" }}
 
       # run tests!
@@ -47,7 +36,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            . venv/bin/activate
+            . venv2/bin/activate
             pytest .
 
       - store_artifacts:
