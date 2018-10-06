@@ -2,6 +2,7 @@ import sys
 import struct
 import argparse
 import numpy as np
+from builtins import range
 
 # Reads an idx file and stores it in a numpy array
 def read_idx( filename ):
@@ -24,7 +25,7 @@ class SimpleNN(object):
         self.weights = []
         self.biases = []
         
-        for i in xrange( len(layers)-1 ):
+        for i in range( len(layers)-1 ):
             self.weights.append(weight_factor * np.random.normal( 0, 1, (layers[i], layers[i+1] )))
             self.biases.append(weight_factor * np.random.normal( 0, 1, (1, layers[i+1] )))
         
@@ -55,7 +56,7 @@ class SimpleNN(object):
         # Store the gradients
         self.gradients.insert(0, grad)
         
-        for i in xrange(len(self.weights)-1, 0, -1):
+        for i in range(len(self.weights)-1, 0, -1):
             # Propagate the error
             grad = self.inputs[i] * (1 - self.inputs[i]) * np.reshape( np.sum(grad * self.weights[i], 1), (1, self.weights[i].shape[0]) )
             # Store the gradients
@@ -154,10 +155,10 @@ if( use_nn ):
 	print('\n-----Starting Training ( Single NN )-----\n')
 
 	# In each epoch...
-	for i in xrange( epochs ):
+	for i in range( epochs ):
 	    # ...pass through the training set
 	    tr_error = 0
-	    for j in xrange(train_data.shape[0]):
+	    for j in range(train_data.shape[0]):
 	        ipt_data = train_data[j:j+1]
 	        
 	        fwd = nn.forward(ipt_data)
@@ -167,7 +168,7 @@ if( use_nn ):
 	    
 	    # Pass through the validation set (only forward pass)    
 	    val_error = 0
-	    for j in xrange(val_data.shape[0]):
+	    for j in range(val_data.shape[0]):
 	        fwd = nn.forward(val_data[j:j+1])
 	        val_error += np.sum(( val_one_hot[j:j+1] - fwd )**2) / 10
 
@@ -203,7 +204,7 @@ if( use_bagging ):
 	print('\n-----Starting Training ( Bagging )-----\n')
 
 	nets = []
-	for n_classifier in xrange( n_models ):
+	for n_classifier in range( n_models ):
 	    print('\nTraining classifier %d\n' % n_classifier)
 	    net = SimpleNN( 784, 10, mid_layers = [30], weight_factor = np.sqrt(2) )
 
@@ -211,7 +212,7 @@ if( use_bagging ):
 	    instance_perm = np.random.permutation( train_data.shape[0] )[ 0:int( train_data.shape[0] * 0.6 ) ]
 	    
 	    # In each epoch...
-	    for i in xrange( epochs_bagging ):
+	    for i in range( epochs_bagging ):
 	    	# ...pass through the training set
 	        for j in instance_perm:
 	            ipt_data = train_data[j:j+1]
@@ -228,7 +229,7 @@ if( use_bagging ):
 
 	# Generate final prediction by summing all of the prediction
 	result_sum = np.zeros((10000,10))
-	for n_classifier in xrange(5):
+	for n_classifier in range(5):
 	    result_sum += nets[n_classifier].forward(test_data)
 	# Accuracy
 	print( 'Bagging - Accuracy on test data: %f' % (np.sum( np.argmax(result_sum, 1) == test_labels ) / float(test_data.shape[0]) ) )
