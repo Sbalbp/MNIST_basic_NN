@@ -1,4 +1,6 @@
+
 # MNIST_basic_NN
+[![CircleCI](https://circleci.com/gh/Sbalbp/MNIST_basic_NN/tree/master.svg?style=svg)](https://circleci.com/gh/Sbalbp/MNIST_basic_NN/tree/master)
 
 Basic implementation of a Neural Network for training on the popular MNIST dataset.
 
